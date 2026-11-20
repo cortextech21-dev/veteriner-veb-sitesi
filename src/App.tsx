@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import {
   PawPrint, Clock, CalendarCheck, Menu, X, Phone, MessageCircle,
   MapPin, ChevronRight, ChevronLeft, ArrowRight, Stethoscope, Syringe,
@@ -9,6 +9,50 @@ import {
   clinic, navLinks, heroSlides, heroIntro, about, services,
   whyUs, stats, team, reviews, blogPosts,
 } from './data'
+
+type Language = 'tr' | 'en'
+
+const LanguageContext = createContext<{ language: Language; setLanguage: (language: Language) => void }>({
+  language: 'tr',
+  setLanguage: () => undefined,
+})
+
+function useLanguage() {
+  return useContext(LanguageContext)
+}
+
+function WhatsAppIcon({ className = 'h-6 w-6' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 32 32" aria-hidden="true" className={className} fill="currentColor">
+      <path d="M16 2.7a13.2 13.2 0 0 0-11.4 20L2.8 29.3l6.8-1.8A13.3 13.3 0 1 0 16 2.7Zm0 24.1c-2.1 0-4.1-.6-5.9-1.7l-.4-.2-4 .9 1-3.9-.3-.4a10.6 10.6 0 1 1 9.6 5.3Zm5.8-7.9c-.3-.2-1.8-.9-2.1-1s-.5-.2-.7.2c-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-1.9-.9-3.1-1.6-4.3-3.6-.3-.5.3-.5.9-1.7.1-.2.1-.4 0-.6l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.2 1.1-1.2 2.7s1.2 3.1 1.4 3.3c.2.2 2.3 3.5 5.6 4.9 2.1.9 2.9 1 3.9.8.6-.1 1.8-.7 2-1.4.3-.7.3-1.3.2-1.4Z" />
+    </svg>
+  )
+}
+
+const copy = {
+  tr: {
+    emergency: '7/24 Acil Servis',
+    hours: 'Poliklinik saatlerimiz: 7/24 açık',
+    whatsapp: 'WhatsApp Destek',
+    appointment: 'Hızlı Randevu Al',
+    clinic: 'VETERİNER KLİNİĞİ',
+    home: 'Ana Sayfa',
+    heroTitle: 'Dostlarınız 7/24 güvenli ellerde',
+    appointmentButton: 'Randevu Al',
+    call: 'Hemen Ara',
+  },
+  en: {
+    emergency: '24/7 Emergency Service',
+    hours: 'Our clinic is open 24/7',
+    whatsapp: 'WhatsApp Support',
+    appointment: 'Quick Appointment',
+    clinic: 'VETERINARY CLINIC',
+    home: 'Home',
+    heroTitle: 'Your friends are in safe hands 24/7',
+    appointmentButton: 'Book an Appointment',
+    call: 'Call Now',
+  },
+}
 
 const iconMap: Record<string, typeof Stethoscope> = {
   stethoscope: Stethoscope,
@@ -25,6 +69,8 @@ const iconMap: Record<string, typeof Stethoscope> = {
 }
 
 function TopBar() {
+  const { language, setLanguage } = useLanguage()
+  const text = copy[language]
   return (
     <div className="relative overflow-x-clip bg-gradient-to-br from-primary-700 via-primary-600 to-primary-800">
       <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -42,7 +88,7 @@ function TopBar() {
           </span>
           <span className="leading-tight">
             <span className="block whitespace-nowrap text-base font-bold tracking-wide xl:text-xl">{clinic.shortName}</span>
-            <span className="block whitespace-nowrap text-[10px] tracking-[0.2em] text-white/85 xl:text-[11px]">VETERİNER KLİNİĞİ</span>
+            <span className="block whitespace-nowrap text-[10px] tracking-[0.2em] text-white/85 xl:text-[11px]">{text.clinic}</span>
           </span>
         </a>
         <div className="flex items-center gap-3 xl:gap-6">
@@ -52,18 +98,18 @@ function TopBar() {
                 <Clock className="h-4 w-4 text-accent-200 xl:h-5 xl:w-5" />
               </span>
               <span className="leading-snug">
-                <span className="block whitespace-nowrap text-[13px] font-bold xl:text-sm">7/24 Acil Servis</span>
-                <span className="block whitespace-nowrap text-[11px] text-white/85 xl:text-xs">Poliklinik saatlerimiz: 7/24 açık</span>
+                <span className="block whitespace-nowrap text-[13px] font-bold xl:text-sm">{text.emergency}</span>
+                <span className="block whitespace-nowrap text-[11px] text-white/85 xl:text-xs">{text.hours}</span>
               </span>
             </div>
           </div>
           <div className="border-l border-white/20 pl-3 xl:pl-6">
             <a href={clinic.whatsappHref} target="_blank" rel="noopener noreferrer" className="group flex items-center gap-3">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/15 ring-1 ring-white/40 transition-colors duration-300 group-hover:bg-white/25 xl:h-12 xl:w-12">
-                <MessageCircle className="h-5 w-5 text-[#25D366] xl:h-6 xl:w-6" />
+                <WhatsAppIcon className="h-5 w-5 text-[#25D366] xl:h-6 xl:w-6" />
               </span>
               <span className="leading-snug">
-                <span className="block whitespace-nowrap text-[13px] font-bold xl:text-sm">WhatsApp Destek</span>
+                <span className="block whitespace-nowrap text-[13px] font-bold xl:text-sm">{text.whatsapp}</span>
                 <span className="block whitespace-nowrap text-[11px] text-white/85 xl:text-xs">{clinic.phoneDisplay}</span>
               </span>
             </a>
@@ -76,14 +122,14 @@ function TopBar() {
               <CalendarCheck className="h-4 w-4 text-accent-200 xl:h-5 xl:w-5" />
             </span>
             <span className="leading-snug">
-              <span className="block whitespace-nowrap text-[13px] font-bold xl:text-sm">Hızlı Randevu Al</span>
+              <span className="block whitespace-nowrap text-[13px] font-bold xl:text-sm">{text.appointment}</span>
               <span className="block whitespace-nowrap text-[11px] text-white/85 xl:text-xs">{clinic.phoneDisplay}</span>
             </span>
           </a>
         </div>
-        <div role="group" aria-label="Dil seçimi" className="absolute right-6 top-4 flex overflow-hidden rounded text-xs font-bold">
-          <span aria-pressed className="bg-white px-2.5 py-1 text-primary-800">TR</span>
-          <span aria-pressed={false} className="bg-white/15 px-2.5 py-1 text-white">EN</span>
+        <div role="group" aria-label="Language selection" className="absolute right-6 top-4 flex overflow-hidden rounded text-xs font-bold">
+          <button type="button" aria-pressed={language === 'tr'} onClick={() => setLanguage('tr')} className={language === 'tr' ? 'bg-white px-2.5 py-1 text-primary-800' : 'bg-white/15 px-2.5 py-1 text-white'}>TR</button>
+          <button type="button" aria-pressed={language === 'en'} onClick={() => setLanguage('en')} className={language === 'en' ? 'bg-white px-2.5 py-1 text-primary-800' : 'bg-white/15 px-2.5 py-1 text-white'}>EN</button>
         </div>
       </div>
     </div>
@@ -91,8 +137,10 @@ function TopBar() {
 }
 
 function NavBar() {
+  const { language } = useLanguage()
   const [open, setOpen] = useState(false)
   const [active, setActive] = useState('#top')
+  const labels = language === 'en' ? ['HOME', 'ABOUT US', 'SERVICES', 'OUR TEAM', 'BLOG', 'CONTACT'] : navLinks.map(l => l.label.toUpperCase())
   useEffect(() => {
     const handler = () => {
       for (const l of navLinks) {
@@ -116,7 +164,7 @@ function NavBar() {
             </span>
             <span className="leading-tight">
               <span className="block whitespace-nowrap text-base font-bold tracking-wide">{clinic.shortName}</span>
-              <span className="block whitespace-nowrap text-[10px] tracking-[0.2em] text-white/85">VETERİNER KLİNİĞİ</span>
+              <span className="block whitespace-nowrap text-[10px] tracking-[0.2em] text-white/85">{copy[language].clinic}</span>
             </span>
           </a>
         </div>
@@ -124,7 +172,7 @@ function NavBar() {
           {navLinks.map((l, i) => (
             <div key={l.href} className="flex h-full items-center">
               {i > 0 && <span aria-hidden className="h-5 w-px bg-white/25" />}
-              <a href={l.href} className={"flex h-full items-center px-4 text-sm font-semibold tracking-wide transition-colors duration-200 xl:px-5 " + (active === l.href ? "bg-white text-primary-800" : "text-white hover:bg-white/10")}>{l.label.toUpperCase()}</a>
+              <a href={l.href} className={"flex h-full items-center px-4 text-sm font-semibold tracking-wide transition-colors duration-200 xl:px-5 " + (active === l.href ? "bg-white text-primary-800" : "text-white hover:bg-white/10")}>{labels[i]}</a>
             </div>
           ))}
         </nav>
@@ -134,8 +182,8 @@ function NavBar() {
       </div>
       {open && (
         <nav className="border-t border-white/10 bg-primary-800 lg:hidden">
-          {navLinks.map(l => (
-            <a key={l.href} href={l.href} onClick={() => setOpen(false)} className={"block px-6 py-3 text-sm font-semibold tracking-wide " + (active === l.href ? "bg-white text-primary-800" : "text-white hover:bg-white/10")}>{l.label.toUpperCase()}</a>
+          {navLinks.map((l, i) => (
+            <a key={l.href} href={l.href} onClick={() => setOpen(false)} className={"block px-6 py-3 text-sm font-semibold tracking-wide " + (active === l.href ? "bg-white text-primary-800" : "text-white hover:bg-white/10")}>{labels[i]}</a>
           ))}
         </nav>
       )}
@@ -144,6 +192,8 @@ function NavBar() {
 }
 
 function Hero() {
+  const { language } = useLanguage()
+  const text = copy[language]
   const [current, setCurrent] = useState(0)
   const next = useCallback(() => setCurrent(c => (c + 1) % heroSlides.length), [])
   const prev = () => setCurrent(c => (c - 1 + heroSlides.length) % heroSlides.length)
@@ -153,68 +203,50 @@ function Hero() {
   }, [next])
   const slide = heroSlides[current]
   return (
-    <section id="top" className="relative overflow-hidden bg-gradient-to-br from-primary-700 via-primary-600 to-primary-800 pb-16 pt-10 text-white lg:pb-24 lg:pt-16">
-      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -left-24 -top-32 h-72 w-72 rounded-full bg-white/10 blur-3xl" />
-        <div className="absolute -bottom-32 -right-24 h-80 w-80 rounded-full bg-accent-500/20 blur-3xl" />
-        <PawPrint className="absolute right-[10%] bottom-10 h-20 w-20 rotate-12 text-white/[0.06]" />
-      </div>
-      <div className="relative mx-auto grid max-w-[1280px] items-center gap-10 px-6 lg:grid-cols-2 lg:gap-16">
-        <div className="animate-fade-up">
-          <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-semibold ring-1 ring-white/30">
+    <section id="top" className="relative flex min-h-[calc(100svh-60px)] items-center overflow-hidden bg-primary-900 text-white">
+      <img src={slide.image} alt={slide.alt} className="absolute inset-0 h-full w-full object-cover transition-opacity duration-700" />
+      <div className="absolute inset-0 bg-gradient-to-r from-primary-900/85 via-primary-800/55 to-primary-900/20" />
+      <div className="absolute inset-0 bg-primary-700/20" />
+      <div className="relative mx-auto w-full max-w-[1280px] px-6 py-24 lg:py-32">
+        <div className="max-w-2xl animate-fade-up">
+          <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-sm font-semibold ring-1 ring-white/40 backdrop-blur-sm">
             <span className="relative flex h-2.5 w-2.5">
               <span className="absolute inline-flex h-full w-full animate-pulse-ring rounded-full bg-accent-300" />
               <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-accent-400" />
             </span>
             {heroIntro.badge}
           </span>
-          <h1 className="mt-5 text-4xl font-bold leading-[1.15] tracking-tight sm:text-5xl lg:text-6xl">
-            Minicik patiler, <span className="text-accent-300">büyük sevgi</span>
+          <h1 className="mt-6 text-5xl font-bold leading-[1.08] tracking-tight sm:text-6xl lg:text-7xl">
+            {text.heroTitle}
           </h1>
-          <p className="mt-5 max-w-xl text-lg leading-relaxed text-white/85">{heroIntro.subtitle}</p>
-          <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
-            <a href={clinic.phoneHref} className="group inline-flex items-center justify-center gap-2 rounded-full bg-white px-7 py-3.5 font-bold text-primary-800 shadow-lg shadow-primary-900/25 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl">
-              <Phone className="h-5 w-5" /> Hemen Ara
+          <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/90">{heroIntro.subtitle}</p>
+          <div className="mt-9 flex flex-col gap-4 sm:flex-row">
+            <a href="#iletisim" className="inline-flex items-center justify-center gap-2 rounded-full bg-accent-600 px-7 py-3.5 font-bold text-white shadow-lg shadow-black/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-accent-700 hover:shadow-xl">
+              <CalendarCheck className="h-5 w-5" /> {text.appointmentButton}
             </a>
-            <a href={clinic.whatsappHref} target="_blank" rel="noopener noreferrer" className="group inline-flex items-center justify-center gap-2 rounded-full bg-[#25D366] px-7 py-3.5 font-bold text-white shadow-lg shadow-black/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#1ebe5a] hover:shadow-xl">
-              <MessageCircle className="h-5 w-5" /> WhatsApp'tan Yazın
+            <a href={clinic.phoneHref} className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-white/80 bg-white/10 px-7 py-3.5 font-bold text-white backdrop-blur-sm transition-all duration-300 hover:bg-white hover:text-primary-800">
+              <Phone className="h-5 w-5" /> {text.call}
             </a>
-          </div>
-          <div className="mt-10 flex flex-wrap gap-8">
-            {stats.map(s => (
-              <div key={s.label}>
-                <div className="text-3xl font-bold text-accent-300">{s.value}</div>
-                <div className="text-sm text-white/70">{s.label}</div>
-              </div>
-            ))}
           </div>
         </div>
-        <div className="relative animate-fade-up lg:pl-8">
-          <div className="relative overflow-hidden rounded-[2rem] shadow-2xl shadow-black/30">
-            <img src={slide.image} alt={slide.alt} className="aspect-[4/3] w-full object-cover transition-opacity duration-700" />
-            <div className="absolute inset-0 bg-gradient-to-t from-primary-900/50 to-transparent" />
-            <div className="absolute bottom-4 left-4 right-4">
-              <p className="text-lg font-bold text-white drop-shadow-lg">{slide.caption}</p>
-            </div>
-            <button onClick={prev} aria-label="Önceki görsel" className="absolute left-3 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-white/40">
-              <ChevronLeft className="h-5 w-5" />
-            </button>
-            <button onClick={next} aria-label="Sonraki görsel" className="absolute right-3 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-white/40">
-              <ChevronRight className="h-5 w-5" />
-            </button>
-          </div>
-          <div className="mt-3 flex justify-center gap-2">
-            {heroSlides.map((_, i) => (
-              <button key={i} onClick={() => setCurrent(i)} aria-label={(i + 1) + ". görsele git"} className={"h-2 rounded-full transition-all " + (i === current ? "w-6 bg-accent-400" : "w-2 bg-white/30")} />
-            ))}
-          </div>
+        <div className="absolute bottom-8 left-1/2 flex -translate-x-1/2 gap-2">
+          {heroSlides.map((_, i) => (
+            <button key={i} onClick={() => setCurrent(i)} aria-label={(i + 1) + ". görsele git"} className={"h-2.5 rounded-full transition-all " + (i === current ? "w-7 bg-accent-400" : "w-2.5 bg-white/60")} />
+          ))}
         </div>
+        <button onClick={prev} aria-label="Önceki görsel" className="absolute left-4 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm transition-colors hover:bg-white/30 lg:left-8">
+          <ChevronLeft className="h-6 w-6" />
+        </button>
+        <button onClick={next} aria-label="Sonraki görsel" className="absolute right-4 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm transition-colors hover:bg-white/30 lg:right-8">
+          <ChevronRight className="h-6 w-6" />
+        </button>
       </div>
     </section>
   )
 }
 
 function About() {
+  const { language } = useLanguage()
   return (
     <section id="hakkimizda" className="bg-stone-50 py-16 lg:py-28">
       <div className="mx-auto grid max-w-[1280px] items-center gap-12 px-6 lg:grid-cols-2 lg:gap-16">
@@ -227,9 +259,9 @@ function About() {
           </div>
         </div>
         <div>
-          <span className="text-sm font-bold uppercase tracking-[0.18em] text-primary-600">{about.eyebrow}</span>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">{about.title}</h2>
-          <p className="mt-5 leading-relaxed text-stone-600">{about.body}</p>
+          <span className="text-sm font-bold uppercase tracking-[0.18em] text-primary-600">{language === 'en' ? 'About Us' : about.eyebrow}</span>
+          <h2 className="mt-3 text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">{language === 'en' ? 'With love, knowledge and patience' : about.title}</h2>
+          <p className="mt-5 leading-relaxed text-stone-600">{language === 'en' ? 'At Bayrampaşa Çapa Veterinary Clinic, we care for your companions like family members. We listen carefully, explain clearly and find the right decision together.' : about.body}</p>
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
             {whyUs.slice(0, 4).map(f => {
               const Icon = iconMap[f.icon] || Stethoscope
@@ -253,13 +285,14 @@ function About() {
 }
 
 function Services() {
+  const { language } = useLanguage()
   return (
     <section id="hizmetler" className="bg-white py-16 lg:py-28">
       <div className="mx-auto max-w-[1280px] px-6">
         <div className="mx-auto max-w-2xl text-center">
-          <span className="text-sm font-bold uppercase tracking-[0.18em] text-primary-600">Hizmetlerimiz</span>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">Her ihtiyaç için tek adres</h2>
-          <p className="mt-4 leading-relaxed text-stone-600">Rutin kontrollerden acil müdahaleye, evcil ve sokak hayvanlarına kadar geniş bir hizmet yelpazesi sunuyoruz.</p>
+          <span className="text-sm font-bold uppercase tracking-[0.18em] text-primary-600">{language === 'en' ? 'Services' : 'Hizmetlerimiz'}</span>
+          <h2 className="mt-3 text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">{language === 'en' ? 'One address for every need' : 'Her ihtiyaç için tek adres'}</h2>
+          <p className="mt-4 leading-relaxed text-stone-600">{language === 'en' ? 'From routine check-ups to emergency care, we provide a wide range of services for pets and street animals.' : 'Rutin kontrollerden acil müdahaleye, evcil ve sokak hayvanlarına kadar geniş bir hizmet yelpazesi sunuyoruz.'}</p>
         </div>
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {services.map(s => {
@@ -287,44 +320,36 @@ function Services() {
 }
 
 function WhyUs() {
+  const { language } = useLanguage()
   return (
-    <section className="bg-stone-50 py-16 lg:py-24">
-      <div className="mx-auto max-w-[1280px] px-6">
+    <section className="relative overflow-hidden bg-primary-900 py-16 text-white lg:py-24">
+      <img src="/pexels-photo-26932295.jpg" alt="Veteriner kliniğinde sevimli kediler" className="absolute inset-0 h-full w-full object-cover" />
+      <div className="absolute inset-0 bg-gradient-to-br from-primary-900/90 via-primary-800/75 to-primary-700/80" />
+      <div className="relative mx-auto max-w-[1280px] px-6">
         <div className="mx-auto max-w-2xl text-center">
-          <span className="text-sm font-bold uppercase tracking-[0.18em] text-primary-600">Neden Biz</span>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">Sizi güvende hissettiren bir klinik</h2>
-          <p className="mt-4 leading-relaxed text-stone-600">Dostlarınızın sağlığı için ihtiyaç duyduğunuz her şey tek bir çatının altında.</p>
+          <span className="text-sm font-bold uppercase tracking-[0.18em] text-accent-300">{language === 'en' ? 'Why Us' : 'Neden Biz'}</span>
+          <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">{language === 'en' ? 'A clinic that makes you feel safe' : 'Sizi güvende hissettiren bir klinik'}</h2>
+          <p className="mt-4 leading-relaxed text-white/85">{language === 'en' ? 'Everything you need for your companions’ health is under one roof.' : 'Dostlarınızın sağlığı için ihtiyaç duyduğunuz her şey tek bir çatının altında.'}</p>
         </div>
-        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {whyUs.map(f => {
+        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {whyUs.slice(1).map(f => {
             const Icon = iconMap[f.icon] || Stethoscope
             return (
-              <div key={f.title} className="rounded-2xl border border-stone-100 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary-900/10">
-                <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-50 text-primary-600 ring-1 ring-primary-100">
-                  <Icon className="h-6 w-6" />
+              <div key={f.title} className="rounded-2xl border border-white/20 bg-white/10 p-6 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:bg-white/15">
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent-600/60 text-accent-100">
+                  <Icon className="h-5 w-5" />
                 </span>
-                <h3 className="mt-4 font-bold text-stone-900">{f.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-stone-600">{f.description}</p>
+                <h3 className="mt-5 font-bold text-white">{f.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-white/80">{f.description}</p>
               </div>
             )
           })}
         </div>
-      </div>
-    </section>
-  )
-}
-
-function StatsBanner() {
-  return (
-    <section className="relative overflow-hidden bg-primary-900 py-20 text-white lg:py-28">
-      <img src="/pexels-photo-26932295.jpg" alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover opacity-15" />
-      <div className="absolute inset-0 bg-gradient-to-br from-primary-900/90 to-primary-800/70" />
-      <div className="relative mx-auto max-w-[1280px] px-6">
-        <div className="grid gap-8 sm:grid-cols-3">
-          {stats.map(s => (
-            <div key={s.label} className="text-center">
-              <div className="text-5xl font-bold text-accent-300 lg:text-6xl">{s.value}</div>
-              <div className="mt-2 text-sm font-semibold tracking-wide text-white/80">{s.label}</div>
+        <div className="mt-11 grid overflow-hidden rounded-2xl border border-accent-300/30 bg-primary-700/80 shadow-xl backdrop-blur-sm sm:grid-cols-3">
+          {stats.map((s, i) => (
+            <div key={s.label} className={"p-5 text-center sm:p-6 " + (i > 0 ? "border-t border-white/20 sm:border-l sm:border-t-0" : "")}>
+              <div className="text-xs font-semibold text-white/80">{s.label}</div>
+              <div className="mt-1 text-4xl font-bold text-white">{s.value}</div>
             </div>
           ))}
         </div>
@@ -334,13 +359,14 @@ function StatsBanner() {
 }
 
 function Team() {
+  const { language } = useLanguage()
   return (
     <section id="ekibimiz" className="bg-white py-16 lg:py-28">
       <div className="mx-auto max-w-[1280px] px-6">
         <div className="mx-auto max-w-2xl text-center">
-          <span className="text-sm font-bold uppercase tracking-[0.18em] text-primary-600">Ekibimiz</span>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">Alanında uzman veteriner hekimlerimiz</h2>
-          <p className="mt-4 leading-relaxed text-stone-600">Her hekimimiz dostlarınız için bilgi, sabır ve sevgiyi bir arada sunar.</p>
+          <span className="text-sm font-bold uppercase tracking-[0.18em] text-primary-600">{language === 'en' ? 'Our Team' : 'Ekibimiz'}</span>
+          <h2 className="mt-3 text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">{language === 'en' ? 'Our experienced veterinary team' : 'Alanında uzman veteriner hekimlerimiz'}</h2>
+          <p className="mt-4 leading-relaxed text-stone-600">{language === 'en' ? 'Every member of our team combines knowledge, patience and love for your companions.' : 'Her hekimimiz dostlarınız için bilgi, sabır ve sevgiyi bir arada sunar.'}</p>
         </div>
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {team.map(m => (
@@ -349,7 +375,7 @@ function Team() {
                 <img src={m.image} alt={m.alt} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
                 <div className="absolute inset-0 bg-gradient-to-t from-primary-900/50 via-transparent to-transparent" />
                 <div className="absolute bottom-4 left-4 right-4">
-                  <span className="inline-block rounded-full bg-white/90 px-4 py-1.5 text-sm font-bold text-primary-800 backdrop-blur-sm">Veteriner Hekim</span>
+                  <span className="inline-block rounded-full bg-white/90 px-4 py-1.5 text-sm font-bold text-primary-800 backdrop-blur-sm">{language === 'en' ? 'Veterinarian' : 'Veteriner Hekim'}</span>
                 </div>
               </div>
             </div>
@@ -361,13 +387,14 @@ function Team() {
 }
 
 function Reviews() {
+  const { language } = useLanguage()
   return (
     <section className="bg-stone-50 py-16 lg:py-28">
       <div className="mx-auto max-w-[1280px] px-6">
         <div className="mx-auto max-w-2xl text-center">
-          <span className="text-sm font-bold uppercase tracking-[0.18em] text-primary-600">Müşteri Yorumları</span>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">Hasta ailelerimiz ne diyor?</h2>
-          <p className="mt-4 leading-relaxed text-stone-600">Google'da paylaşılan gerçek deneyimlerden seçilmiş birkaç yorum.</p>
+          <span className="text-sm font-bold uppercase tracking-[0.18em] text-primary-600">{language === 'en' ? 'Reviews' : 'Müşteri Yorumları'}</span>
+          <h2 className="mt-3 text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">{language === 'en' ? 'What do our patient families say?' : 'Hasta ailelerimiz ne diyor?'}</h2>
+          <p className="mt-4 leading-relaxed text-stone-600">{language === 'en' ? 'A selection of real experiences shared on Google.' : "Google'da paylaşılan gerçek deneyimlerden seçilmiş birkaç yorum."}</p>
         </div>
         <div className="mt-12 grid gap-6 lg:grid-cols-3">
           {reviews.map(r => (
@@ -393,13 +420,14 @@ function Reviews() {
 }
 
 function Blog() {
+  const { language } = useLanguage()
   const [expanded, setExpanded] = useState<string | null>(null)
   return (
     <section id="blog" className="bg-white py-16 lg:py-28">
       <div className="mx-auto max-w-[1280px] px-6">
         <div className="mx-auto max-w-2xl text-center">
-          <span className="text-sm font-bold uppercase tracking-[0.18em] text-primary-600">Blog</span>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">Dostlarınız için faydalı bilgiler</h2>
+          <span className="text-sm font-bold uppercase tracking-[0.18em] text-primary-600">{language === 'en' ? 'Blog' : 'Blog'}</span>
+          <h2 className="mt-3 text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">{language === 'en' ? 'Useful information for your companions' : 'Dostlarınız için faydalı bilgiler'}</h2>
           <p className="mt-4 leading-relaxed text-stone-600">Sağlık, beslenme ve bakım üzerine kısa ve anlaşılır rehberler. Bir yazının üzerine gelin ya da dokunarak büyütün.</p>
         </div>
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -434,6 +462,7 @@ function Blog() {
 }
 
 function Contact() {
+  const { language } = useLanguage()
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
   const [petType, setPetType] = useState('kedi')
@@ -457,8 +486,8 @@ function Contact() {
     <section id="iletisim" className="bg-stone-50 py-16 lg:py-28">
       <div className="mx-auto max-w-[1280px] px-6">
         <div className="mx-auto max-w-2xl text-center">
-          <span className="text-sm font-bold uppercase tracking-[0.18em] text-primary-600">İletişim</span>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">Randevu alın, bize ulaşın</h2>
+          <span className="text-sm font-bold uppercase tracking-[0.18em] text-primary-600">{language === 'en' ? 'Contact' : 'İletişim'}</span>
+          <h2 className="mt-3 text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">{language === 'en' ? 'Book an appointment, contact us' : 'Randevu alın, bize ulaşın'}</h2>
           <p className="mt-4 leading-relaxed text-stone-600">Formu doldurun, sizi en kısa sürede arayalım. Acil durumlarda doğrudan arayabilir ya da WhatsApp'tan yazabilirsiniz.</p>
         </div>
         <div className="mt-12 grid gap-8 lg:grid-cols-2">
@@ -551,6 +580,15 @@ function Contact() {
   )
 }
 
+function FloatingWhatsApp() {
+  return (
+    <a href={clinic.whatsappHref} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp ile iletişime geçin" className="fixed bottom-5 right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-xl shadow-[#25D366]/40 ring-4 ring-white/80 transition-transform hover:scale-110">
+      <span className="absolute inset-0 rounded-full bg-[#25D366] animate-ping opacity-40" />
+      <WhatsAppIcon className="relative h-8 w-8" />
+    </a>
+  )
+}
+
 function Footer() {
   return (
     <footer className="bg-primary-900 py-12 text-white">
@@ -604,8 +642,10 @@ function Footer() {
 }
 
 export default function App() {
+  const [language, setLanguage] = useState<Language>('tr')
   return (
-    <div className="min-h-screen bg-stone-50">
+    <LanguageContext.Provider value={{ language, setLanguage }}>
+      <div className="min-h-screen bg-stone-50">
       <header className="text-white">
         <TopBar />
         <NavBar />
@@ -615,13 +655,14 @@ export default function App() {
         <About />
         <Services />
         <WhyUs />
-        <StatsBanner />
         <Team />
         <Reviews />
         <Blog />
         <Contact />
       </main>
       <Footer />
+      <FloatingWhatsApp />
     </div>
+    </LanguageContext.Provider>
   )
 }
